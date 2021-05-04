@@ -69,12 +69,11 @@ RUN set -eux \
   ; NVIM_SETUP_PLUGINS=1 \
     nvim -u $nvim_home/init.vim --headless +'PlugInstall' +qa \
   #; rm -rf $nvim_home/plugged/*/.git \
-  ; for x in $(cat $nvim_home/coc-core-extensions) \
-  ; do nvim -u $nvim_home/init.vim --headless +"CocInstall -sync coc-$x" +qa; done \
-  ; mv $nvim_home/coc-data /opt/vim && chmod -R 777 /opt/vim/coc-data \
-  ; ln -sf /opt/vim/coc-data $nvim_home \
+  ; nvim -u $nvim_home/init.vim --headless +'LspInstall python' +qa \
   ; mv $nvim_home/plugged /opt/vim \
   ; ln -sf /opt/vim/plugged $nvim_home \
+  ; mkdir -p /root/.config \
+  ; ln -sf $nvim_home /root/.config/nvim \
   \
   ; SKIP_CYTHON_BUILD=1 $nvim_home/plugged/vimspector/install_gadget.py --enable-python \
   ; rm -f $nvim_home/plugged/vimspector/gadgets/linux/download/debugpy/*/*.zip \
@@ -82,9 +81,10 @@ RUN set -eux \
   ; coc_lua_bin_repo=josa42/coc-lua-binaries \
   ; lua_ls_ver=$(curl -sSL -H "'$github_header'" $github_api/${coc_lua_bin_repo}/releases | jq -r '.[0].tag_name') \
   ; lua_ls_url=https://github.com/${coc_lua_bin_repo}/releases/download/${lua_ls_ver}/lua-language-server-linux.tar.gz \
-  ; lua_coc_data=$nvim_home/coc-data/extensions/coc-lua-data \
-  ; mkdir -p $lua_coc_data \
-  ; curl -sSL ${lua_ls_url} | tar zxf - -C $lua_coc_data \
+  ; mkdir -p /opt/language-server/sumneko_lua \
+  ; curl -sSL ${lua_ls_url} | tar zxf - \
+      -C /opt/language-server/sumneko_lua \
+      --strip-components=1 \
   \
   ; npm cache clean -f \
   ; apt-get autoremove -y && apt-get clean -y && rm -rf /var/lib/apt/lists/*
