@@ -69,7 +69,7 @@ RUN set -eux \
   ; NVIM_SETUP_PLUGINS=1 \
     nvim -u $nvim_home/init.vim --headless +'PlugInstall' +qa \
   #; rm -rf $nvim_home/plugged/*/.git \
-  ; nvim -u $nvim_home/init.vim --headless +'LspInstall python' +qa \
+  ; npm -g install pyright \
   ; mv $nvim_home/plugged /opt/vim \
   ; ln -sf /opt/vim/plugged $nvim_home \
   \
