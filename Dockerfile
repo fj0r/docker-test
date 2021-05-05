@@ -72,8 +72,6 @@ RUN set -eux \
   ; nvim -u $nvim_home/init.vim --headless +'LspInstall python' +qa \
   ; mv $nvim_home/plugged /opt/vim \
   ; ln -sf /opt/vim/plugged $nvim_home \
-  ; mkdir -p /root/.config \
-  ; ln -sf $nvim_home /root/.config/nvim \
   \
   ; SKIP_CYTHON_BUILD=1 $nvim_home/plugged/vimspector/install_gadget.py --enable-python \
   ; rm -f $nvim_home/plugged/vimspector/gadgets/linux/download/debugpy/*/*.zip \
