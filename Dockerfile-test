@@ -1,0 +1,5 @@
+FROM fj0rd/test
+
+RUN NVIM_BOOTSTRAP=1 \
+    nvim -u $nvim_home/init.vim --headless +'autocmd User PackerComplete sleep 100m | qall' +PackerSync \
+        2>/dev/null || true
