@@ -73,6 +73,12 @@ RUN set -eux \
   ; mv $nvim_home/pack /opt/vim \
   ; ln -sf /opt/vim/pack $nvim_home \
   \
+  ; ln -sf $cfg_home/.config /root \
+  ; NVIM_BOOTSTRAP=1 \
+    nvim -u /root/.config/nvim/init.lua --headless \
+    +'autocmd User PackerComplete quitall' \
+    +'lua require("packer").sync()' \
+  \
   ; coc_lua_bin_repo=josa42/coc-lua-binaries \
   ; lua_ls_ver=$(curl -sSL -H "'$github_header'" $github_api/${coc_lua_bin_repo}/releases | jq -r '.[0].tag_name') \
   ; lua_ls_url=https://github.com/${coc_lua_bin_repo}/releases/download/${lua_ls_ver}/lua-language-server-linux.tar.gz \

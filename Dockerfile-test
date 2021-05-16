@@ -1,5 +1,9 @@
 FROM fj0rd/test
 
-RUN NVIM_BOOTSTRAP=1 \
-    nvim -u $nvim_home/init.vim +'autocmd User PackerComplete sleep 100m | qall' +PackerSync \
-        2>/dev/null || true
+RUN set -eux \
+  ; export https_proxy=http://192.168.31.111:1081 \
+  ; ln -sf /etc/skel/.config /root \
+  ; NVIM_BOOTSTRAP=1 \
+    nvim -u /root/.config/nvim/init.lua --headless \
+    +'autocmd User PackerComplete quitall' \
+    +'lua require("packer").sync()'
