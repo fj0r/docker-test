@@ -21,8 +21,8 @@ RUN set -eux \
   ; just_url=https://github.com/${just_repo}/releases/download/${just_ver}/just-${just_ver}-x86_64-unknown-linux-musl.tar.gz \
   ; curl -sSL ${just_url} | tar zxf - -C /usr/local/bin just \
   \
-  ; watchexec_ver=$(curl -sSL -H "'$github_header'" $github_api/${watchexec_repo}/releases | jq -r '.[0].tag_name') \
-  ; watchexec_url=https://github.com/${watchexec_repo}/releases/download/${watchexec_ver}/watchexec-${watchexec_ver}-x86_64-unknown-linux-musl.tar.xz \
+  ; watchexec_ver=$(curl -sSL -H "'$github_header'" $github_api/${watchexec_repo}/releases | jq -r '.[0].tag_name' | cut -c 6-) \
+  ; watchexec_url=https://github.com/${watchexec_repo}/releases/download/cli-v${watchexec_ver}/watchexec-${watchexec_ver}-x86_64-unknown-linux-musl.tar.xz \
   ; curl -sSL ${watchexec_url} | tar Jxf - --strip-components=1 -C /usr/local/bin watchexec-${watchexec_ver}-x86_64-unknown-linux-musl/watchexec \
   \
   ; yq_ver=$(curl -sSL -H "'$github_header'" $github_api/${yq_repo}/releases | jq -r '.[0].tag_name') \
@@ -42,18 +42,18 @@ RUN set -eux \
   ; curl -sSL ${wasmtime_url} | tar Jxf - --strip-components=1 -C /usr/local/bin wasmtime-${wasmtime_ver}-x86_64-linux/wasmtime
 
 RUN set -eux \
-  ; curl -sL https://deb.nodesource.com/setup_14.x | bash - \
+  ; curl -sL https://deb.nodesource.com/setup_15.x | bash - \
   ; apt-get install -y --no-install-recommends nodejs \
   \
   ; nvim_ver=$(curl -sSL -H "'$github_header'" $github_api/${nvim_repo}/releases | jq -r '.[0].tag_name') \
   ; nvim_url=https://github.com/${nvim_repo}/releases/download/${nvim_ver}/nvim-linux64.tar.gz \
   ; curl -sSL ${nvim_url} | tar zxf - -C /usr/local --strip-components=1 \
   ; pip3 --no-cache-dir install \
-        neovim neovim-remote requests \
+        neovim neovim-remote debugpy \
         # aiohttp aiofile fastapi uvicorn fabric \
         PyParsing decorator more-itertools \
         typer hydra-core pyyaml invoke \
-        cachetools chronyk fn.py \
+        requests cachetools chronyk fn.py \
   \
   ; cfg_home=/etc/skel \
   ; mkdir $cfg_home/.zshrc.d \
@@ -65,18 +65,13 @@ RUN set -eux \
   \
   ; mkdir $cfg_home/.config \
   ; nvim_home=$cfg_home/.config/nvim \
-  ; git clone --depth=1 https://github.com/fj0r/nvim.git $nvim_home \
-  ; NVIM_SETUP_PLUGINS=1 \
-    nvim -u $nvim_home/init.vim --headless +'PlugInstall' +qa \
-  #; rm -rf $nvim_home/plugged/*/.git \
+  ; git clone --recursive --depth=1 https://github.com/fj0r/nvim-lua.git $nvim_home \
+  #; rm -rf $nvim_home/pack/packer/start/*/.git \
   ; npm install -g pyright \
                    vscode-json-languageserver \
                    yaml-language-server \
-  ; mv $nvim_home/plugged /opt/vim \
-  ; ln -sf /opt/vim/plugged $nvim_home \
-  \
-  ; SKIP_CYTHON_BUILD=1 $nvim_home/plugged/vimspector/install_gadget.py --enable-python \
-  ; rm -f $nvim_home/plugged/vimspector/gadgets/linux/download/debugpy/*/*.zip \
+  ; mv $nvim_home/pack /opt/vim \
+  ; ln -sf /opt/vim/pack $nvim_home \
   \
   ; coc_lua_bin_repo=josa42/coc-lua-binaries \
   ; lua_ls_ver=$(curl -sSL -H "'$github_header'" $github_api/${coc_lua_bin_repo}/releases | jq -r '.[0].tag_name') \
@@ -88,3 +83,7 @@ RUN set -eux \
   \
   ; npm cache clean -f \
   ; apt-get autoremove -y && apt-get clean -y && rm -rf /var/lib/apt/lists/*
+
+# RUN NVIM_BOOTSTRAP=1 \
+#     nvim -u $nvim_home/init.vim --headless +'autocmd User PackerComplete sleep 100m | qall' +PackerSync \
+#         2>/dev/null || true
